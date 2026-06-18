@@ -6,6 +6,7 @@ When the user asks to create, install, review, standardize, index, or validate S
 
 - Read `docs/SKILL_SPEC.md`, `docs/SKILLS_INDEX_SPEC.md`, and `skills/skill-scaffold/SKILL.md` first when they are relevant.
 - Treat `skill-scaffold` as a manual-invocation management Skill. Plan before edits unless the user explicitly says to proceed directly.
+- If the user provides a GitHub repository and asks to install a Skill, treat it as a third-party Skill install flow by default.
 - Use lowercase kebab-case Skill names and prefer `<domain>-<action>-<object>`.
 - Use domain prefixes such as `learn`, `pm`, `ux`, `code`, `db`, `ops`, `doc`, and `skill`.
 - Put project Skills under `.claude/skills/<skill-name>/`.
@@ -13,6 +14,13 @@ When the user asks to create, install, review, standardize, index, or validate S
 - Do not create `scripts/` unless deterministic commands are required.
 - High-risk Skills in `code`, `db`, and `ops` should normally include `disable-model-invocation: true`.
 - Review third-party Skill scripts for risky commands before installation.
+- For third-party GitHub installs, default to:
+  - review before install
+  - choose the most relevant Skill automatically when there is one clear best match
+  - install into the current project's `.claude/skills/`
+  - generate or update `.claude/SKILLS_INDEX.md`
+  - validate after installation
+  - report the selected Skill, install path, index update status, and validation result
 - Update `.claude/SKILLS_INDEX.md` or propose an index entry whenever a Skill is created, renamed, moved, disabled, archived, or materially repurposed.
 - Prefer ASCII in generated files unless the file already uses another encoding or character set intentionally.
 
@@ -26,5 +34,12 @@ When planning a Skill change, include:
 6. Files to create or modify
 7. `SKILLS_INDEX.md` impact
 8. Validation plan
+
+When installing a GitHub Skill, the final summary should include:
+
+1. Installed Skill name
+2. Installed target path
+3. Whether `SKILLS_INDEX.md` was updated
+4. Validation result
 
 Do not run remote install commands, do not add secrets, and do not use destructive file operations without explicit confirmation.
