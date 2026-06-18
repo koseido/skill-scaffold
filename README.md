@@ -306,3 +306,7 @@ When in doubt, prefer manual invocation, smaller scope, and explicit review.
 `skill-scaffold` is for the stage where local AI Skills are no longer a small personal collection.
 
 It helps users manage Skill creation and installation with best practices from the beginning, so Skills remain easier to use, easier to scale, and safer to maintain.
+
+## Acknowledgements
+
+[LINUX DO — Chinese Developer Community](https://linux.do/) 
