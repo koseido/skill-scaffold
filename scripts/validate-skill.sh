@@ -10,6 +10,7 @@ set -euo pipefail
 #   ./scripts/validate-skill.sh .claude/skills
 #   ./scripts/validate-skill.sh ~/.claude/skills
 #   ./scripts/validate-skill.sh skills
+#   ./scripts/validate-skill.sh .claude/skills .claude/SKILLS_INDEX.md
 #
 # Checks:
 #   - Skill directory name uses lowercase kebab-case
@@ -19,12 +20,14 @@ set -euo pipefail
 #   - Required sections exist
 #   - High-risk domains code/db/ops disable automatic invocation
 #   - Scripts do not contain risky commands
+#   - SKILLS_INDEX.md structure and rows match Skill metadata
 #
 # Exit code:
 #   0 = no blocking errors
 #   1 = blocking validation errors found
 
 ROOT="${1:-.claude/skills}"
+INDEX_PATH="${2:-}"
 
 if [[ ! -d "$ROOT" ]]; then
   echo "Error: Skills directory not found: $ROOT" >&2
@@ -33,6 +36,8 @@ fi
 
 ERRORS=0
 WARNINGS=0
+SUMMARY_FILE="$(mktemp)"
+trap 'rm -f "$SUMMARY_FILE"' EXIT
 
 print_header() {
   echo ""
@@ -40,17 +45,17 @@ print_header() {
 }
 
 add_error() {
-  echo "  ❌ $1"
+  echo "  [ERROR] $1"
   ERRORS=$((ERRORS + 1))
 }
 
 add_warning() {
-  echo "  ⚠️  $1"
+  echo "  [WARN]  $1"
   WARNINGS=$((WARNINGS + 1))
 }
 
 add_ok() {
-  echo "  ✅ $1"
+  echo "  [OK]    $1"
 }
 
 has_required_section() {
@@ -129,6 +134,14 @@ is_high_risk_skill() {
   fi
 
   return 1
+}
+
+detect_index_path() {
+  if [[ -n "$INDEX_PATH" ]]; then
+    echo "$INDEX_PATH"
+  elif [[ -f "$(dirname "$ROOT")/SKILLS_INDEX.md" ]]; then
+    echo "$(dirname "$ROOT")/SKILLS_INDEX.md"
+  fi
 }
 
 check_risky_scripts() {
@@ -254,6 +267,65 @@ validate_one_skill() {
   else
     add_warning "examples/ missing. Recommended for trigger examples."
   fi
+
+  local domain auto_trigger
+  domain="${skill_name%%-*}"
+  auto_trigger="Yes"
+  if frontmatter_has_true "$skill_md" "disable-model-invocation"; then
+    auto_trigger="No"
+  fi
+  echo "$skill_name|$domain|$auto_trigger" >> "$SUMMARY_FILE"
+}
+
+validate_index() {
+  local index_path
+  index_path="$(detect_index_path)"
+
+  if [[ -z "$index_path" ]]; then
+    add_warning "SKILLS_INDEX.md not found next to the Skills directory. Recommended for active Skill collections."
+    return
+  fi
+
+  print_header "SKILLS_INDEX.md"
+  add_ok "Index path: $index_path"
+
+  if ! grep -Eq '^\|\s*Skill\s*\|\s*Domain\s*\|\s*Scope\s*\|\s*Status\s*\|\s*Risk\s*\|\s*Auto trigger\s*\|\s*Purpose\s*\|$' "$index_path"; then
+    add_error "Index header does not match the required format."
+  else
+    add_ok "Index header matches the required format"
+  fi
+
+  if ! grep -Eq '^\|[^|]+\|[^|]+\|[^|]+\|[^|]+\|[^|]+\|[^|]+\|[^|]+\|$' "$index_path"; then
+    add_warning "Index contains no Skill rows."
+    return
+  fi
+
+  while IFS='|' read -r skill_name domain auto_trigger; do
+    [[ -n "$skill_name" ]] || continue
+
+    local row row_count row_domain row_auto
+    row="$(grep -E "^\|[[:space:]]*$skill_name[[:space:]]*\|" "$index_path" || true)"
+    if [[ -z "$row" ]]; then
+      add_warning "Missing index row for Skill: $skill_name"
+      continue
+    fi
+
+    row_count="$(grep -Ec "^\|[[:space:]]*$skill_name[[:space:]]*\|" "$index_path" || true)"
+    if [[ "$row_count" -gt 1 ]]; then
+      add_warning "Duplicate index rows found for Skill: $skill_name"
+    fi
+
+    row_domain="$(echo "$row" | awk -F'|' 'NR==1 { gsub(/^[ \t]+|[ \t]+$/, "", $3); print $3 }')"
+    row_auto="$(echo "$row" | awk -F'|' 'NR==1 { gsub(/^[ \t]+|[ \t]+$/, "", $7); print $7 }')"
+
+    if [[ "$row_domain" != "$domain" ]]; then
+      add_warning "Index domain mismatch for $skill_name: $row_domain != $domain"
+    fi
+
+    if [[ "$row_auto" != "$auto_trigger" ]]; then
+      add_warning "Index auto trigger mismatch for $skill_name: $row_auto != $auto_trigger"
+    fi
+  done < "$SUMMARY_FILE"
 }
 
 print_header "Validating Skills"
@@ -271,6 +343,8 @@ if [[ "$FOUND" -eq 0 ]]; then
   echo "No Skill directories found under: $ROOT"
   exit 0
 fi
+
+validate_index
 
 print_header "Summary"
 echo "Skills checked: $FOUND"

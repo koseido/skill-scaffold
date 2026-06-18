@@ -8,6 +8,7 @@ However, all of them can follow file-based rules if you provide:
 
 ```text
 docs/SKILL_SPEC.md
+docs/SKILLS_INDEX_SPEC.md
 AGENTS.md
 .claude/skills/<skill-name>/SKILL.md
 ```
@@ -20,22 +21,27 @@ Use this structure:
 
 ```text
 your-project/
-├── AGENTS.md
-├── docs/
-│   ├── SKILL_SPEC.md
-│   └── SKILL_USAGE_GUIDE.md
-├── scripts/
-│   ├── install-skill.sh
-│   └── validate-skill.sh
-├── .claude/
-│   ├── SKILLS_INDEX.md
-│   └── skills/
-│       ├── code-safe-feature/
-│       ├── pm-prd-review/
-│       └── learn-concept-explain/
-└── .cursor/
-    └── rules/
-        └── skill-creation.mdc
+|- AGENTS.md
+|- docs/
+|  |- SKILL_SPEC.md
+|  |- SKILLS_INDEX_SPEC.md
+|  `- SKILL_USAGE_GUIDE.md
+|- scripts/
+|  |- install-skill.sh
+|  |- install-skill.ps1
+|  |- validate-skill.sh
+|  |- validate-skill.ps1
+|  |- generate-skills-index.sh
+|  `- generate-skills-index.ps1
+|- .claude/
+|  |- SKILLS_INDEX.md
+|  `- skills/
+|     |- code-safe-feature/
+|     |- pm-prd-review/
+|     `- learn-concept-explain/
+`- .cursor/
+   `- rules/
+      `- skill-creation.mdc
 ```
 
 Use only the files supported by your AI IDE.
@@ -57,9 +63,10 @@ The AI should:
 
 1. Read the project rules.
 2. Read `docs/SKILL_SPEC.md`.
-3. Create Skill files according to the specification.
-4. Update `.claude/SKILLS_INDEX.md`.
-5. Validate the generated Skill.
+3. Read `docs/SKILLS_INDEX_SPEC.md`.
+4. Create Skill files according to the specification.
+5. Update `.claude/SKILLS_INDEX.md`.
+6. Validate the generated Skill.
 
 ---
 
@@ -68,7 +75,7 @@ The AI should:
 Use this prompt in your AI IDE:
 
 ```text
-Please read AGENTS.md and docs/SKILL_SPEC.md first.
+Please read AGENTS.md, docs/SKILL_SPEC.md, and docs/SKILLS_INDEX_SPEC.md first.
 
 I want to create a new project-level Skill.
 
@@ -86,8 +93,9 @@ First output:
 3. Files to create
 4. SKILL.md frontmatter
 5. Whether disable-model-invocation is required
-6. Whether scripts are needed
-7. Validation checklist
+6. SKILLS_INDEX.md impact
+7. Whether scripts are needed
+8. Validation checklist
 ```
 
 Then:
@@ -114,6 +122,7 @@ description: Rules for creating and validating local AI Skills
 globs:
   - ".claude/skills/**"
   - "docs/SKILL_SPEC.md"
+  - "docs/SKILLS_INDEX_SPEC.md"
   - ".claude/SKILLS_INDEX.md"
 alwaysApply: false
 ---
@@ -123,17 +132,18 @@ alwaysApply: false
 When creating, installing, updating, organizing, or validating Skills:
 
 1. Read `docs/SKILL_SPEC.md`.
-2. Use `.claude/skills/<skill-name>/SKILL.md`.
-3. Use lowercase kebab-case names.
-4. Prefer `<domain>-<action>-<object>`.
-5. Use domain prefixes: learn, pm, ux, code, db, ops, doc, skill.
-6. High-risk Skills for code/db/ops should include `disable-model-invocation: true`.
-7. Keep `SKILL.md` short.
-8. Use `references/`, `templates/`, and `examples/`.
-9. Create `scripts/` only when needed.
-10. Update `.claude/SKILLS_INDEX.md`.
-11. Do not add risky scripts without explicit approval.
-12. Validate after creation.
+2. Read `docs/SKILLS_INDEX_SPEC.md`.
+3. Use `.claude/skills/<skill-name>/SKILL.md`.
+4. Use lowercase kebab-case names.
+5. Prefer `<domain>-<action>-<object>`.
+6. Use domain prefixes: learn, pm, ux, code, db, ops, doc, skill.
+7. High-risk Skills for code/db/ops should include `disable-model-invocation: true`.
+8. Keep `SKILL.md` short.
+9. Use `references/`, `templates/`, and `examples/`.
+10. Create `scripts/` only when needed.
+11. Update `.claude/SKILLS_INDEX.md`.
+12. Do not add risky scripts without explicit approval.
+13. Validate after creation.
 ```
 
 ---
@@ -145,7 +155,7 @@ For tools that use chat-based instructions, paste this before asking for file cr
 ```text
 You are creating local AI Skills for this repository.
 
-Follow docs/SKILL_SPEC.md.
+Follow docs/SKILL_SPEC.md and docs/SKILLS_INDEX_SPEC.md.
 
 Rules:
 - Create Skills under .claude/skills/<skill-name>/
@@ -168,7 +178,7 @@ Copilot Chat may need explicit file references.
 Use prompts like:
 
 ```text
-Read #file:docs/SKILL_SPEC.md first.
+Read #file:docs/SKILL_SPEC.md and #file:docs/SKILLS_INDEX_SPEC.md first.
 
 Create a project-level Skill:
 - domain: pm
@@ -195,7 +205,7 @@ Do not create scripts.
 Prompt:
 
 ```text
-Please read docs/SKILL_SPEC.md.
+Please read docs/SKILL_SPEC.md and docs/SKILLS_INDEX_SPEC.md.
 
 Create a global-style example Skill under examples/learn-concept-explain/.
 
@@ -216,7 +226,7 @@ Requirements:
 Prompt:
 
 ```text
-Please read docs/SKILL_SPEC.md.
+Please read docs/SKILL_SPEC.md and docs/SKILLS_INDEX_SPEC.md.
 
 Create a project-level Skill under .claude/skills/code-safe-feature/.
 
@@ -238,7 +248,7 @@ Requirements:
 Ask:
 
 ```text
-Please validate all Skills under .claude/skills according to docs/SKILL_SPEC.md.
+Please validate all Skills under .claude/skills according to docs/SKILL_SPEC.md and docs/SKILLS_INDEX_SPEC.md.
 
 Return a table with:
 - Skill
@@ -256,6 +266,7 @@ Check:
 7. Unnecessary scripts
 8. Risky script commands
 9. Missing SKILLS_INDEX.md entry
+10. SKILLS_INDEX.md header or columns do not match the spec
 ```
 
 ---
@@ -315,6 +326,13 @@ Fix:
 Update .claude/SKILLS_INDEX.md after creating or renaming a Skill.
 ```
 
+If your repository includes helper scripts, you can also run:
+
+```bash
+./scripts/generate-skills-index.sh .claude/skills
+./scripts/validate-skill.sh .claude/skills
+```
+
 ---
 
 ## 12. Recommended workflow summary
@@ -323,18 +341,12 @@ Use this flow:
 
 ```text
 Write docs/SKILL_SPEC.md
-↓
-Add AI IDE rules if supported
-↓
-Ask AI to plan Skill creation
-↓
-Review plan
-↓
-Confirm file creation
-↓
-Ask AI to validate the generated Skill
-↓
-Commit changes
+-> Add AI IDE rules if supported
+-> Ask AI to plan Skill creation
+-> Review plan
+-> Confirm file creation
+-> Ask AI to validate the generated Skill
+-> Commit changes
 ```
 
 For VSCode AI IDEs, the key is to make Skill creation rules explicit in files the AI can read.

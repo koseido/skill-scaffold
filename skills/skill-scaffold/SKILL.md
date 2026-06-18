@@ -1,6 +1,7 @@
 ---
 name: skill-scaffold
 description: Create, install, review, standardize, index, and validate local AI Skills using a safe flat naming convention. Use when creating new Skills, installing third-party Skills, organizing Claude Code Skills, updating SKILLS_INDEX.md, or checking Skill best practices. Do not use for ordinary coding, PRD review, deployment, database migration, or broad task execution. Keywords: create skill, install skill, skill best practices, SKILLS_INDEX, validate skill, Claude Code skills.
+disable-model-invocation: true
 ---
 
 # skill-scaffold
@@ -155,6 +156,7 @@ For completed changes, return:
 
 - Do not overwrite an existing Skill unless the user explicitly confirms.
 - Do not delete or move Skills without explicit confirmation.
+- Always plan before creating, moving, overwriting, or deleting Skill files unless the user explicitly asks to proceed directly.
 - Do not execute third-party install scripts or remote commands.
 - Do not use `curl | bash` installation flows.
 - Do not create scripts unless they are necessary, deterministic, and easy to review.
@@ -182,6 +184,8 @@ Use `templates/SKILL.template.md` when generating a new Skill.
 Use `templates/output-template.md` when the user wants a standard scaffold output.
 
 Use `examples/trigger-examples.md` when the user wants invocation examples.
+
+If the repository defines a `SKILLS_INDEX.md` format or an `AGENTS.md` workflow, follow those rules in addition to this Skill.
 
 ## Validation checklist
 

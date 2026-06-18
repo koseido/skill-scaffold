@@ -36,6 +36,7 @@ For Codex, the most important files are:
 ```text
 AGENTS.md
 docs/SKILL_SPEC.md
+docs/SKILLS_INDEX_SPEC.md
 skills/skill-scaffold/SKILL.md
 ```
 
@@ -52,7 +53,7 @@ Add this section:
 
 When the user asks to create, install, update, organize, or validate a Skill:
 
-1. Read `docs/SKILL_SPEC.md` if it exists.
+1. Read `docs/SKILL_SPEC.md` and `docs/SKILLS_INDEX_SPEC.md` if they exist.
 2. If available, read `skills/skill-scaffold/SKILL.md` or `~/.claude/skills/skill-scaffold/SKILL.md`.
 3. Do not create files immediately.
 4. First output a creation plan:
@@ -79,7 +80,7 @@ When the user asks to create, install, update, organize, or validate a Skill:
 Use this prompt when creating a new Skill:
 
 ```text
-Please read AGENTS.md and docs/SKILL_SPEC.md first.
+Please read AGENTS.md, docs/SKILL_SPEC.md, and docs/SKILLS_INDEX_SPEC.md first.
 
 I want to create a new project-level Skill.
 
@@ -141,7 +142,7 @@ First output the plan before editing files.
 Prompt:
 
 ```text
-Please read AGENTS.md and docs/SKILL_SPEC.md.
+Please read AGENTS.md, docs/SKILL_SPEC.md, and docs/SKILLS_INDEX_SPEC.md.
 
 Create a project-level Skill:
 - domain: code
@@ -168,7 +169,7 @@ Requirements:
 Prompt:
 
 ```text
-Please validate all Skills under .claude/skills according to docs/SKILL_SPEC.md.
+Please validate all Skills under .claude/skills according to docs/SKILL_SPEC.md and docs/SKILLS_INDEX_SPEC.md.
 
 Check:
 1. Directory names are lowercase kebab-case
@@ -178,7 +179,7 @@ Check:
 5. Required sections exist
 6. High-risk Skills include disable-model-invocation: true
 7. Scripts do not contain risky commands
-8. SKILLS_INDEX.md is up to date
+8. SKILLS_INDEX.md is up to date and matches Skill metadata
 
 Return a table of issues and suggested fixes.
 ```
@@ -190,16 +191,17 @@ Return a table of issues and suggested fixes.
 Prompt:
 
 ```text
-Please inspect .claude/skills and update .claude/SKILLS_INDEX.md.
+Please inspect .claude/skills and update .claude/SKILLS_INDEX.md according to docs/SKILLS_INDEX_SPEC.md.
 
 Use this format:
 
-| Skill | Domain | Scope | Risk | Auto trigger | Purpose |
-|---|---|---|---|---|---|
+| Skill | Domain | Scope | Status | Risk | Auto trigger | Purpose |
+|---|---|---|---|---|---|---|
 
 Infer:
 - Domain from the first prefix
 - Scope as project
+- Status as active unless the Skill is in a lifecycle directory
 - Risk from domain and SKILL.md
 - Auto trigger from disable-model-invocation
 - Purpose from description

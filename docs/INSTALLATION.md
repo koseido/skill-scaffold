@@ -49,6 +49,13 @@ mkdir -p ~/.claude/skills
 cp -R skills/skill-scaffold ~/.claude/skills/
 ```
 
+On Windows PowerShell:
+
+```powershell
+New-Item -ItemType Directory -Force -Path "$HOME/.claude/skills"
+Copy-Item -Recurse -Path "skills/skill-scaffold" -Destination "$HOME/.claude/skills/"
+```
+
 ### Verify
 
 Check:
@@ -111,6 +118,12 @@ chmod +x scripts/install-skill.sh
 ./scripts/install-skill.sh
 ```
 
+On Windows PowerShell:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/install-skill.ps1
+```
+
 A basic installer should copy:
 
 ```text
@@ -128,6 +141,13 @@ If the installer supports arguments, recommended usage is:
 ```bash
 ./scripts/install-skill.sh --scope global
 ./scripts/install-skill.sh --scope project --target /path/to/your-project
+```
+
+PowerShell equivalents:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/install-skill.ps1 -Scope global
+powershell -ExecutionPolicy Bypass -File scripts/install-skill.ps1 -Scope project -Target C:\path\to\your-project
 ```
 
 ---
@@ -226,10 +246,22 @@ chmod +x scripts/validate-skill.sh
 ./scripts/validate-skill.sh .claude/skills
 ```
 
+On Windows PowerShell:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/validate-skill.ps1 .claude/skills
+```
+
 For global Skills:
 
 ```bash
 ./scripts/validate-skill.sh ~/.claude/skills
+```
+
+PowerShell:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/validate-skill.ps1 "$HOME/.claude/skills"
 ```
 
 Validation should check:
@@ -242,10 +274,36 @@ Validation should check:
 - High-risk Skills disable automatic invocation
 - Required sections exist
 - Scripts are not risky
+- `SKILLS_INDEX.md` matches the required format and current Skills
 
 ---
 
-## 9. Updating installation
+## 9. Generating SKILLS_INDEX.md
+
+If your Skill collection does not yet have an index, generate one with:
+
+```bash
+./scripts/generate-skills-index.sh .claude/skills
+```
+
+For global Skills:
+
+```bash
+./scripts/generate-skills-index.sh ~/.claude/skills
+```
+
+On Windows PowerShell:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/generate-skills-index.ps1 .claude/skills
+powershell -ExecutionPolicy Bypass -File scripts/generate-skills-index.ps1 "$HOME/.claude/skills"
+```
+
+By default, the generator writes `SKILLS_INDEX.md` next to the Skills directory using the format defined in `docs/SKILLS_INDEX_SPEC.md`.
+
+---
+
+## 10. Updating installation
 
 To update `skill-scaffold`, replace the installed directory:
 
@@ -264,7 +322,7 @@ cp -R ~/.claude/skills/skill-scaffold ~/.claude/skills/skill-scaffold.backup
 
 ---
 
-## 10. Uninstall
+## 11. Uninstall
 
 Global uninstall:
 
@@ -282,7 +340,7 @@ Use caution with deletion commands.
 
 ---
 
-## 11. Troubleshooting
+## 12. Troubleshooting
 
 ### Skill does not show up
 
@@ -336,7 +394,7 @@ and use manual invocation.
 
 ---
 
-## 12. Safety notes
+## 13. Safety notes
 
 Do not install third-party Skills blindly.
 
