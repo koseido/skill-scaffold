@@ -20,6 +20,7 @@ Use this Skill when the user wants to:
 
 - Create a new global or project Skill
 - Install an existing Skill into `~/.claude/skills/` or `.claude/skills/`
+- Install a third-party Skill from a GitHub repository
 - Review a third-party Skill before installing it
 - Convert a nested Skill layout into flat prefix-based naming
 - Improve a Skill name, description, structure, or safety behavior
@@ -58,6 +59,8 @@ ux-prototype-review
 Collect or infer:
 
 - Operation type: create, install, review, standardize, index, validate, disable, archive, or document
+- Source type: local Skill path, GitHub repository, or existing installed Skill
+- GitHub repository URL, if the user is installing from GitHub
 - Scope: global, project, lab, disabled, or archive
 - Target directory, such as `~/.claude/skills/` or `.claude/skills/`
 - Domain prefix, such as `learn`, `pm`, `ux`, `code`, `db`, `ops`, `doc`, `biz`, or `skill`
@@ -70,21 +73,35 @@ Collect or infer:
 
 If information is missing, make a safe recommendation and list assumptions. Ask for confirmation before creating, moving, overwriting, or deleting files.
 
+Default recommendation for third-party GitHub installs:
+
+- Review before installing
+- Choose the most relevant Skill automatically when the repository contains one clear best match
+- Install into the current project's `.claude/skills/`
+- Generate or update `.claude/SKILLS_INDEX.md`
+- Run validation after installation
+- Return a final installation summary
+
 ## Workflow
 
 1. Identify the user's operation: create, install, review, standardize, index, validate, or lifecycle management.
-2. Determine scope and target directory.
-3. Normalize the Skill name using flat lowercase kebab-case, preferably `<domain>-<action>-<object>`.
-4. Check whether the domain prefix is clear and searchable.
-5. Write or review the description using: what it does + when to use it + when not to use it + keywords.
-6. Determine risk level and whether `disable-model-invocation: true` is required.
-7. Keep `SKILL.md` focused on purpose, fit, inputs, workflow, output, and safety.
-8. Move detailed rules into `references/`, output formats into `templates/`, and examples into `examples/`.
-9. Avoid creating `scripts/` unless deterministic commands are necessary.
-10. If scripts exist, inspect them for risky commands, secret access, network access, deployment, destructive file operations, or git history changes.
-11. Update or propose an entry for `SKILLS_INDEX.md`.
-12. Run or recommend validation after changes.
-13. Summarize created files, changed files, risks, and next steps.
+2. Determine whether the source is a local Skill path, a GitHub repository, or an installed Skill.
+3. Determine scope and target directory.
+4. For GitHub repository installs, review the candidate Skill before installation.
+5. If the repository contains multiple Skills, choose the most relevant one when there is one clear best match and state which one was selected.
+6. If multiple Skills are equally plausible, pause and ask the user which one to install.
+7. Normalize the Skill name using flat lowercase kebab-case, preferably `<domain>-<action>-<object>`.
+8. Check whether the domain prefix is clear and searchable.
+9. Write or review the description using: what it does + when to use it + when not to use it + keywords.
+10. Determine risk level and whether `disable-model-invocation: true` is required.
+11. Keep `SKILL.md` focused on purpose, fit, inputs, workflow, output, and safety.
+12. Move detailed rules into `references/`, output formats into `templates/`, and examples into `examples/`.
+13. Avoid creating `scripts/` unless deterministic commands are necessary.
+14. If scripts exist, inspect them for risky commands, secret access, network access, deployment, destructive file operations, or git history changes.
+15. For third-party GitHub installs, default to the current project's `.claude/skills/` unless the user explicitly asks for global installation.
+16. Update or propose an entry for `SKILLS_INDEX.md`.
+17. Run or recommend validation after changes.
+18. Summarize the installed Skill, install path, index update status, validation result, and next steps.
 
 ## Output format
 
@@ -136,6 +153,26 @@ Pass / Needs changes / Do not install yet
 ### 8. Next steps
 ```
 
+For installing a third-party Skill from GitHub, return:
+
+```md
+## Skill install summary
+
+### 1. Selected Skill
+
+### 2. Install path
+
+### 3. Review result
+
+Pass / Needs changes / Lab only / Do not install
+
+### 4. Index update status
+
+### 5. Validation result
+
+### 6. Notes and next steps
+```
+
 For completed changes, return:
 
 ```md
@@ -159,6 +196,7 @@ For completed changes, return:
 - Always plan before creating, moving, overwriting, or deleting Skill files unless the user explicitly asks to proceed directly.
 - Do not execute third-party install scripts or remote commands.
 - Do not use `curl | bash` installation flows.
+- Do not install a GitHub Skill without first reviewing `SKILL.md` and any included `scripts/`.
 - Do not create scripts unless they are necessary, deterministic, and easy to review.
 - Do not include secrets, tokens, `.env`, SSH keys, private URLs, or personal absolute paths in generated Skills.
 - High-risk Skills in `code`, `db`, and `ops` should usually include `disable-model-invocation: true`.
@@ -212,26 +250,28 @@ Before considering a Skill ready, check:
 ```text
 /skill-scaffold
 
-我要创建一个项目级 Skill：
+I want to create a project-level Skill.
 - domain: code
 - name: safe-feature
 - risk: high
-- purpose: 新增功能前做安全变更分析
+- purpose: Analyze a feature change before editing code.
 
-先不要创建文件，先输出创建方案。
+Do not create files yet.
+First output the creation plan.
 ```
 
 ```text
 /skill-scaffold
 
-我从 GitHub 下载了一个 Skill，路径是：
-.claude/skills/code-review/
+Please install this Skill using the skill-scaffold standard.
 
-请先检查是否符合最佳实践，只输出问题和优化建议，不要修改文件。
+GitHub repository:
+https://github.com/example/some-skills-repo
 ```
 
 ```text
 /skill-scaffold
 
-请帮我把当前项目 `.claude/skills/` 里的 Skills 做一次索引整理，生成或更新 `.claude/SKILLS_INDEX.md`。修改前先列出计划。
+Please inspect the current project's `.claude/skills/` directory and update `.claude/SKILLS_INDEX.md`.
+Show me the plan before editing files.
 ```

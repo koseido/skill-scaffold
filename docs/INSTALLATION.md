@@ -1,12 +1,12 @@
 # Installation
 
-This document explains how to install `skill-scaffold` and how to use it to create new Skills.
+This document explains how to install `skill-scaffold`, how to install it into a project, and how to use the same standard when installing third-party Skills from GitHub.
 
 ---
 
-## 1. What gets installed?
+## 1. What gets installed
 
-The installable Skill is located at:
+The installable management Skill is located at:
 
 ```text
 skills/skill-scaffold/
@@ -16,17 +16,23 @@ It contains:
 
 ```text
 skills/skill-scaffold/
-├── SKILL.md
-├── references/
-│   └── skill-best-practices.md
-├── templates/
-│   ├── SKILL.template.md
-│   └── output-template.md
-└── examples/
-    └── trigger-examples.md
+|- SKILL.md
+|- references/
+|- templates/
+`- examples/
 ```
 
-Installing means copying this directory into a place where your AI tool can discover it.
+Installing `skill-scaffold` means copying this directory into a place where your AI tool can discover it.
+
+It is not the same as:
+
+```text
+npm install
+pip install
+brew install
+```
+
+It is closer to placing a structured workflow package in a discoverable Skill directory.
 
 ---
 
@@ -40,7 +46,7 @@ Recommended target:
 ~/.claude/skills/skill-scaffold/
 ```
 
-### Manual install
+### Bash / Unix-like
 
 From the repository root:
 
@@ -49,7 +55,7 @@ mkdir -p ~/.claude/skills
 cp -R skills/skill-scaffold ~/.claude/skills/
 ```
 
-On Windows PowerShell:
+### Windows PowerShell
 
 ```powershell
 New-Item -ItemType Directory -Force -Path "$HOME/.claude/skills"
@@ -73,7 +79,7 @@ templates
 examples
 ```
 
-In Claude Code, you can then use:
+After that, in Claude Code you can use:
 
 ```text
 /skill-scaffold
@@ -91,7 +97,7 @@ Recommended target:
 .claude/skills/skill-scaffold/
 ```
 
-### Manual install
+### Bash / Unix-like
 
 From the repository root where `skill-scaffold` was cloned:
 
@@ -107,48 +113,35 @@ mkdir -p .claude/skills
 cp -R /path/to/skill-scaffold/skills/skill-scaffold .claude/skills/
 ```
 
+### Windows PowerShell
+
+```powershell
+New-Item -ItemType Directory -Force -Path "C:\path\to\your-project\.claude\skills"
+Copy-Item -Recurse -Path "C:\path\to\skill-scaffold\skills\skill-scaffold" -Destination "C:\path\to\your-project\.claude\skills\"
+```
+
 ---
 
-## 4. Install with script
+## 4. Install with scripts
 
-If this repository includes `scripts/install-skill.sh`, you can install with:
+This repository includes both bash and PowerShell installers.
+
+### Bash / Unix-like
 
 ```bash
 chmod +x scripts/install-skill.sh
-./scripts/install-skill.sh
-```
-
-On Windows PowerShell:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts/install-skill.ps1
-```
-
-A basic installer should copy:
-
-```text
-skills/skill-scaffold
-```
-
-to:
-
-```text
-~/.claude/skills/skill-scaffold
-```
-
-If the installer supports arguments, recommended usage is:
-
-```bash
 ./scripts/install-skill.sh --scope global
 ./scripts/install-skill.sh --scope project --target /path/to/your-project
 ```
 
-PowerShell equivalents:
+### Windows PowerShell
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts/install-skill.ps1 -Scope global
 powershell -ExecutionPolicy Bypass -File scripts/install-skill.ps1 -Scope project -Target C:\path\to\your-project
 ```
+
+These scripts only copy Skill directories and create a backup when overwrite mode is explicitly requested.
 
 ---
 
@@ -164,42 +157,45 @@ Project:
 your-project/.claude/skills/<project-specific-skill>/
 ```
 
-Why?
+Why:
 
-- `skill-scaffold` is a general Skill creation tool.
-- Most new Skills should be project-specific.
-- Global Skills should stay few and stable.
+- `skill-scaffold` is a general management Skill
+- most business or code Skills should be project-specific
+- global Skill directories should stay small and stable
 
 ---
 
-## 6. First usage
+## 6. First usage after installation
 
-After installation, open Claude Code in a project directory and run:
+After installation, open Claude Code or another supported AI tool and use `skill-scaffold` as the management entry point.
+
+Example:
 
 ```text
 /skill-scaffold
 
-我要创建一个项目级 Skill：
+I want to create a project-level Skill.
 - domain: code
 - name: safe-feature
 - risk: high
-- purpose: 新增功能前做安全变更分析
+- purpose: Analyze a feature change before editing code.
 
-先不要创建文件，先输出创建方案。
+Do not create files yet.
+First output the creation plan.
 ```
 
 Expected behavior:
 
-1. It proposes the final Skill name.
-2. It identifies the target directory.
-3. It decides the risk level.
-4. It recommends `disable-model-invocation: true` for high-risk Skills.
-5. It lists files to create.
-6. It waits for confirmation before creating files.
+1. It proposes the final Skill name
+2. It identifies the target directory
+3. It determines the risk level
+4. It recommends `disable-model-invocation: true` for high-risk Skills
+5. It lists files to create or modify
+6. It waits for confirmation before creating files
 
 ---
 
-## 7. Creating a new Skill
+## 7. Creating a new Skill with the standard flow
 
 Recommended flow:
 
@@ -208,57 +204,228 @@ Recommended flow:
 ```text
 /skill-scaffold
 
-我要创建一个项目级 Skill：
+I want to create a project-level Skill.
 - domain: pm
 - name: prd-review
 - risk: medium
-- purpose: 评审产品需求文档，检查目标、用户场景、业务流程、边界条件、验收标准和实现风险
+- purpose: Review product requirement documents for goals, user scenarios, workflows, edge cases, acceptance criteria, and implementation risks.
 
-先不要创建文件，先输出创建方案。
+Do not create files yet.
+First output the creation plan.
 ```
 
 ### Step 2: Confirm creation
 
 ```text
-确认，请按方案创建文件，并更新 .claude/SKILLS_INDEX.md。
+Confirmed. Please create the files according to the plan and update .claude/SKILLS_INDEX.md.
 ```
 
-### Step 3: Review result
+### Step 3: Review the generated result
 
-Check the generated files:
+Expected structure:
 
 ```text
 .claude/skills/pm-prd-review/
-├── SKILL.md
-├── references/
-├── templates/
-└── examples/
+|- SKILL.md
+|- references/
+|- templates/
+`- examples/
 ```
 
 ---
 
-## 8. Validation
+## 8. Installing a third-party Skill from GitHub
 
-If this repository includes `scripts/validate-skill.sh`, run:
+Use this flow when you want to install an existing Skill from GitHub while still following the `skill-scaffold` standard.
+
+### Step 1: Clone the source repository
+
+Example:
+
+```bash
+git clone https://github.com/example/some-skills-repo.git
+cd some-skills-repo
+```
+
+Windows PowerShell:
+
+```powershell
+git clone https://github.com/example/some-skills-repo.git
+Set-Location some-skills-repo
+```
+
+### Step 2: Identify the Skill directory
+
+Look for a directory that contains `SKILL.md`, for example:
+
+```text
+some-skills-repo/
+`- skills/
+   `- code-review/
+      |- SKILL.md
+      |- references/
+      |- templates/
+      `- examples/
+```
+
+### Step 3: Review before installing
+
+Do not install a third-party Skill blindly.
+
+Review:
+
+- `SKILL.md`
+- `references/`
+- `templates/`
+- `examples/`
+- `scripts/`
+
+Use the checklist in [docs/THIRD_PARTY_SKILL_REVIEW.md](</C:/00.work/04.code/skill-scaffold/docs/THIRD_PARTY_SKILL_REVIEW.md>).
+
+At minimum, confirm:
+
+- the Skill name is clear
+- the description is specific
+- high-risk behavior is constrained
+- scripts do not contain risky commands
+- the Skill belongs in `global`, `project`, or `lab`
+
+### Step 4: Decide the target scope
+
+Use `global` when the Skill is general and reusable across many projects.
+
+Use `project` when the Skill is tied to a specific codebase or workflow.
+
+Use `lab` first when the Skill is useful but not yet trusted enough for an active directory.
+
+### Step 5: Install with the script using `--source`
+
+Global install:
+
+```bash
+./scripts/install-skill.sh \
+  --source /path/to/some-skills-repo/skills/code-review \
+  --scope global
+```
+
+Project install:
+
+```bash
+./scripts/install-skill.sh \
+  --source /path/to/some-skills-repo/skills/code-review \
+  --scope project \
+  --target /path/to/your-project
+```
+
+Windows PowerShell global install:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/install-skill.ps1 `
+  -Source C:\path\to\some-skills-repo\skills\code-review `
+  -Scope global
+```
+
+Windows PowerShell project install:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/install-skill.ps1 `
+  -Source C:\path\to\some-skills-repo\skills\code-review `
+  -Scope project `
+  -Target C:\path\to\your-project
+```
+
+If the target Skill already exists, review the existing copy first.
+
+Only use overwrite mode after you are sure you want to replace it:
+
+```bash
+./scripts/install-skill.sh --source /path/to/skill --scope project --target /path/to/project --force
+```
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/install-skill.ps1 -Source C:\path\to\skill -Scope project -Target C:\path\to\project -Force
+```
+
+### Step 6: Generate or update the index
+
+After installation, update `SKILLS_INDEX.md`.
+
+Project Skills:
+
+```bash
+./scripts/generate-skills-index.sh /path/to/your-project/.claude/skills
+```
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/generate-skills-index.ps1 C:\path\to\your-project\.claude\skills
+```
+
+Global Skills:
+
+```bash
+./scripts/generate-skills-index.sh ~/.claude/skills
+```
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/generate-skills-index.ps1 "$HOME/.claude/skills"
+```
+
+### Step 7: Validate after installation
+
+Run validation to confirm the Skill and index both follow the standard.
+
+```bash
+./scripts/validate-skill.sh /path/to/your-project/.claude/skills
+```
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/validate-skill.ps1 C:\path\to\your-project\.claude\skills
+```
+
+### Recommended summary
+
+Use this sequence:
+
+```text
+clone
+-> inspect
+-> review
+-> choose scope
+-> install with --source
+-> generate or update SKILLS_INDEX.md
+-> validate
+```
+
+---
+
+## 9. Validation
+
+Use the validation scripts after creating, installing, or updating Skills.
+
+### Bash / Unix-like
+
+Project Skills:
 
 ```bash
 chmod +x scripts/validate-skill.sh
 ./scripts/validate-skill.sh .claude/skills
 ```
 
-On Windows PowerShell:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts/validate-skill.ps1 .claude/skills
-```
-
-For global Skills:
+Global Skills:
 
 ```bash
 ./scripts/validate-skill.sh ~/.claude/skills
 ```
 
-PowerShell:
+### Windows PowerShell
+
+Project Skills:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/validate-skill.ps1 .claude/skills
+```
+
+Global Skills:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts/validate-skill.ps1 "$HOME/.claude/skills"
@@ -270,29 +437,33 @@ Validation should check:
 - `SKILL.md` exists
 - `name` exists
 - `description` exists
-- Naming uses kebab-case
-- High-risk Skills disable automatic invocation
-- Required sections exist
-- Scripts are not risky
+- naming uses kebab-case
+- high-risk Skills disable automatic invocation
+- required sections exist
+- scripts are not risky
 - `SKILLS_INDEX.md` matches the required format and current Skills
 
 ---
 
-## 9. Generating SKILLS_INDEX.md
+## 10. Generating SKILLS_INDEX.md
 
 If your Skill collection does not yet have an index, generate one with:
+
+### Bash / Unix-like
+
+Project Skills:
 
 ```bash
 ./scripts/generate-skills-index.sh .claude/skills
 ```
 
-For global Skills:
+Global Skills:
 
 ```bash
 ./scripts/generate-skills-index.sh ~/.claude/skills
 ```
 
-On Windows PowerShell:
+### Windows PowerShell
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts/generate-skills-index.ps1 .claude/skills
@@ -303,26 +474,29 @@ By default, the generator writes `SKILLS_INDEX.md` next to the Skills directory 
 
 ---
 
-## 10. Updating installation
+## 11. Updating skill-scaffold
 
-To update `skill-scaffold`, replace the installed directory:
+If you want to update your installed copy of `skill-scaffold`, prefer a backup-and-replace flow instead of destructive deletion.
 
-```bash
-rm -rf ~/.claude/skills/skill-scaffold
-cp -R skills/skill-scaffold ~/.claude/skills/
-```
-
-Use caution with `rm -rf`.
-
-If you customized your local copy, back it up first:
+### Bash / Unix-like
 
 ```bash
 cp -R ~/.claude/skills/skill-scaffold ~/.claude/skills/skill-scaffold.backup
+cp -R skills/skill-scaffold ~/.claude/skills/
 ```
+
+### Windows PowerShell
+
+```powershell
+Copy-Item -Recurse -Path "$HOME/.claude/skills/skill-scaffold" -Destination "$HOME/.claude/skills/skill-scaffold.backup"
+Copy-Item -Recurse -Path "skills/skill-scaffold" -Destination "$HOME/.claude/skills/"
+```
+
+If you customized your installed copy, inspect the differences before replacing it.
 
 ---
 
-## 11. Uninstall
+## 12. Uninstall
 
 Global uninstall:
 
@@ -336,11 +510,18 @@ Project uninstall:
 rm -rf .claude/skills/skill-scaffold
 ```
 
+Windows PowerShell:
+
+```powershell
+Remove-Item -Recurse -Force "$HOME/.claude/skills/skill-scaffold"
+Remove-Item -Recurse -Force ".claude/skills/skill-scaffold"
+```
+
 Use caution with deletion commands.
 
 ---
 
-## 12. Troubleshooting
+## 13. Troubleshooting
 
 ### Skill does not show up
 
@@ -378,9 +559,9 @@ Use:
 
 Check:
 
-- Name is specific
-- Description includes when not to use it
-- Workflow is focused on one complete task
+- name is specific
+- description includes when not to use it
+- workflow is focused on one complete task
 
 ### High-risk Skill triggers too easily
 
@@ -394,7 +575,7 @@ and use manual invocation.
 
 ---
 
-## 13. Safety notes
+## 14. Safety notes
 
 Do not install third-party Skills blindly.
 
