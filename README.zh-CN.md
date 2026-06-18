@@ -303,3 +303,7 @@ skill-scaffold/
 `skill-scaffold` 面向的是这样一个阶段：本地 AI Skills 已经不再是少量个人收藏，而开始变成一个持续增长的系统。
 
 它帮助用户从一开始就用最佳实践去创建和安装 Skills，让 Skills 更容易使用、更容易扩展，也更容易长期维护。
+
+## 社区
+
+ [LINUX DO — 中文开发者社区](https://linux.do/) 
